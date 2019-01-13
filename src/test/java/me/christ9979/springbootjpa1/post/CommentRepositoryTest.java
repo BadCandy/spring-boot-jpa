@@ -4,7 +4,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import static me.christ9979.springbootjpa1.post.CommentSpecs.isBest;
+import static me.christ9979.springbootjpa1.post.CommentSpecs.isGood;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
@@ -65,5 +69,16 @@ public class CommentRepositoryTest {
             System.out.println("=================");
 
         });
+    }
+
+    /**
+     * Specifications를 이용한 쿼리 메서드 호출 테스트
+     * 코드가 깔끔해지고 명확해진다는 장점이 있다.
+     *
+     * CommentSpecs에서 정의한 Specifications를 사용한다.
+     */
+    @Test
+    public void specsTest() {
+        commentRepository.findAll(isBest().or(isGood()), PageRequest.of(0, 10));
     }
 }
