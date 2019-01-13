@@ -3,11 +3,21 @@ package me.christ9979.springbootjpa1.post;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.repository.query.QueryByExampleExecutor;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface CommentRepository extends JpaRepository<Comment, Long>, JpaSpecificationExecutor<Comment> {
+/**
+ * Specifications을 이용한 Query 메소드를 사용하기 위해서는
+ * JpaSpecificationExecutor을 상속받아야 한다.
+ */
+
+/**
+ * QBE(Query By Example)을 사용하기 위해서는
+ * QueryByExampleExecutor을 상속받아야 한다.
+ */
+public interface CommentRepository extends JpaRepository<Comment, Long>, JpaSpecificationExecutor<Comment>, QueryByExampleExecutor<Comment> {
 
     /**
      * @EntityGraph는 @NamedEntityGraph에 정의되어 있는 엔티티 그룹을 사용한다.
