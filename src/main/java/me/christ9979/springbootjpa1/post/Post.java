@@ -4,6 +4,12 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
+/**
+ * jpql로 직접 쿼리를 작성하고 싶다면 @NamedQuery를 이용한다.
+ * Repository 인터페이스에도 관련 메서드를 작성해야한다.
+ * native sql로 작성하고 싶다면, @NamedNativeQuery를 이용한다.
+ */
+@NamedQuery(name = "Post.findByTitle", query = "SELECT p FROM Post AS p WHERE p.title = ?1")
 public class Post {
 
     @Id @GeneratedValue

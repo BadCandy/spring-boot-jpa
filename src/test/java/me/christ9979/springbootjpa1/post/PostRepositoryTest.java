@@ -4,6 +4,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.JpaSort;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.persistence.EntityManager;
@@ -42,6 +44,7 @@ public class PostRepositoryTest {
         post.setTitle("jpa");
         Post savedPost = postRepository.save(post); // Transient -> Persistent
 
+        // persist()의 경우 입력한 entity와 반환한 entity가 같다.
         assertThat(entityManager.contains(post)).isTrue();
         assertThat(entityManager.contains(savedPost)).isTrue();
         assertThat(savedPost == post);
@@ -58,11 +61,51 @@ public class PostRepositoryTest {
         postUpdate.setTitle("hibernate");
         Post updatedPost = postRepository.save(postUpdate); // Detached -> Persistent
 
+        // merge()의 경우 입력한 entity와 반환한 entity가 다르다.
         assertThat(entityManager.contains(updatedPost)).isTrue();
         assertThat(entityManager.contains(postUpdate)).isFalse();
         assertThat(updatedPost == postUpdate);
 
         List<Post> all = postRepository.findAll();
+        assertThat(all.size()).isEqualTo(1);
+    }
+
+    /**
+     * JPA 쿼리 메소드를 이용한 테스트
+     */
+    @Test
+    public void findByTitleStartsWith() {
+
+        Post post = new Post();
+        post.setTitle("Spring Data Jpa");
+        postRepository.save(post);
+
+        List<Post> all = postRepository.findByTitleStartsWith("Spring");
+        assertThat(all.size()).isEqualTo(1);
+    }
+
+    /**
+     * JPA @NamedQuery 및 @Query로 작성한 메소드를 이용한 테스
+     */
+    @Test
+    public void findByTitle() {
+
+        Post post = new Post();
+        post.setTitle("Spring");
+        postRepository.save(post);
+
+        List<Post> all = postRepository.findByTitle("Spring");
+        assertThat(all.size()).isEqualTo(1);
+
+        /**
+         * Sort 또는 Pageable를 @Query와 같이 사용할 수 있다.
+         * 단, entity에 정의된 프로퍼트 또는 alias를 기준으로만 사용할 수 있다.
+         */
+        all = postRepository.findByTitle("Spring", Sort.by("title"));
+        /**
+         * 위 제약사항을 우회하려면 JpaSort.unsafe를 이용한다.
+         */
+        all = postRepository.findByTitle("Spring", JpaSort.unsafe("LENGTH(title)"));
         assertThat(all.size()).isEqualTo(1);
     }
 }
