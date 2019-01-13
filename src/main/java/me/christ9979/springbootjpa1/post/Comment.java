@@ -1,6 +1,13 @@
 package me.christ9979.springbootjpa1.post;
 
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * @NamedEntityGraph는 @Entity에서 재사용할 여러 엔티티 그룹을
@@ -10,6 +17,15 @@ import javax.persistence.*;
  */
 @NamedEntityGraph(name = "Comment.post",
                 attributeNodes = @NamedAttributeNode("post"))
+/**
+ * Auditing 기능중 @CreatedDate, @LastModifiedDate 기능을 활성화하기 위해
+ * @EntityListeners(AuditingEntityListener.class) 설정으로 Auditing 리스너를
+ * 등록한다.
+ *
+ * @CreatedBy, @LastModifiedBy를 사용하려면 @EnableJpaAuditing(auditorAwareRef = "Bean name")으로
+ * 유저를 명시하는데 사용하는 빈을 등록해주어 한다.
+ */
+@EntityListeners(AuditingEntityListener.class)
 @Entity
 public class Comment {
 
@@ -34,6 +50,28 @@ public class Comment {
     private int down;
 
     private boolean best;
+
+    /**
+     * Auditing 기능을 위한 프로퍼티들.
+     * @CreatedDate, @CreatedBy, @LastModifiedDate, @LastModifiedBy을
+     * 설정한다.
+     *
+     * @~By에는 @ManyToOne이라는 것을 붙여 항상 매핑시켜줘야 동작한다.
+     *
+     */
+    @CreatedDate
+    private Date created;
+
+    @CreatedBy
+    @ManyToOne
+    private Account createdBy;
+
+    @LastModifiedDate
+    private Date updated;
+
+    @LastModifiedBy
+    @ManyToOne
+    private Account updatedBy;
 
     public int getUp() {
         return up;
@@ -82,4 +120,14 @@ public class Comment {
     public void setPost(Post post) {
         this.post = post;
     }
+
+    /**
+     * @PrePersist는 콜백으로써 Entity가 persistent되기 전에 호출이 된다.
+     * 이 외에도 @PreRemove, @PostRemove, @PostPersist 등이 있다.
+     */
+    @PrePersist
+    public void prePersist() {
+        System.out.println("Pre Persist is called");
+    }
+
 }

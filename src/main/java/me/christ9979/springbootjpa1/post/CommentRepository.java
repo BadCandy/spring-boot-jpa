@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.query.QueryByExampleExecutor;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +34,13 @@ public interface CommentRepository extends JpaRepository<Comment, Long>, JpaSpec
 //    @EntityGraph(attributePaths = "post")
     Optional<Comment> getById(Long id);
 
+
+    /**
+     * 데이터를 update하거나 insert를 하지 않는 쿼리 메서드에서는 @Transactional(readOnly = true) 설정을
+     * 해주는 것이 좋다. 데이터를 수정하지 않을 것이라고 PersistentContext가 확신할 수 있으므로
+     * Entity의 상태값이 변했는지를 지속적으로 확인하는 Dirty Checking을 하지 않아 성능이 좋아진다.
+     */
+    @Transactional(readOnly = true)
     /**
      * Projection이란 entity의 일부 데이터만 가져오는 것이다.
      *
