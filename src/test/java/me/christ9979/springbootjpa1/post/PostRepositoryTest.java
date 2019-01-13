@@ -11,6 +11,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -76,9 +77,7 @@ public class PostRepositoryTest {
     @Test
     public void findByTitleStartsWith() {
 
-        Post post = new Post();
-        post.setTitle("Spring Data Jpa");
-        postRepository.save(post);
+        savePost("Spring Data Jpa");
 
         List<Post> all = postRepository.findByTitleStartsWith("Spring");
         assertThat(all.size()).isEqualTo(1);
@@ -90,9 +89,7 @@ public class PostRepositoryTest {
     @Test
     public void findByTitle() {
 
-        Post post = new Post();
-        post.setTitle("Spring");
-        postRepository.save(post);
+        savePost("Spring");
 
         List<Post> all = postRepository.findByTitle("Spring");
         assertThat(all.size()).isEqualTo(1);
@@ -108,4 +105,33 @@ public class PostRepositoryTest {
         all = postRepository.findByTitle("Spring", JpaSort.unsafe("LENGTH(title)"));
         assertThat(all.size()).isEqualTo(1);
     }
+
+    /**
+     * 직접 작성한 update 쿼리를 테스트하는 메소드
+     * 직접 update 쿼리나 delete 쿼리를 작성하는것은 추천하지 않는다.
+     */
+    @Test
+    public void updateTitle() {
+
+        Post spring = savePost("Spring");
+        String hibernate = "hibernate";
+        int update = postRepository.updateTitle(hibernate, spring.getId());
+        assertThat(update).isEqualTo(1);
+
+        /**
+         * @Modifying(clearAutomatically = true, flushAutomatically = true)
+         * 설정이 되어 있지 않다면, 다음의 테스트는 실패한다.
+         * Jpa가 entity의 값을 새로 가져오지 않고, 캐시된 값을 가져오기 때문이다.
+         */
+        Optional<Post> byId = postRepository.findById(spring.getId());
+        assertThat(byId.get().getTitle()).isEqualTo(hibernate);
+    }
+
+    private Post savePost(String spring) {
+
+        Post post = new Post();
+        post.setTitle(spring);
+        return postRepository.save(post);
+    }
+
 }

@@ -2,6 +2,7 @@ package me.christ9979.springbootjpa1.post;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -31,4 +32,15 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      */
     @Query("SELECT p FROM Post AS p WHERE p.title = ?1")
     List<Post> findByTitle(String title, Sort sort);
+
+    /**
+     * 업데이트 쿼리를 작성한다.
+     * 직접 update 쿼리나 delete 쿼리를 작성하는것은 추천하지 않는다.
+     * 일일이 @Modifying의 clearAutomatically, flushAutomatically 값을 바꾸어 주어야 한다.
+     * 그 외에 직접 쿼리를 작성하면 이벤트를 처리하는 콜백 기능도 사용할 수 없다.
+     */
+//    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Modifying
+    @Query("UPDATE Post p SET p.title = ?1 WHERE p.id = ?2")
+    int updateTitle(String hibernate, Long id);
 }
