@@ -52,6 +52,15 @@ public class Comment {
     private boolean best;
 
     /**
+     * @Enumerated로 enum을 매핑한다.
+     * 디폴트는 value = EnumType.ORDINAL인데, 절대 이렇게 사용하지 말자.
+     * Enum 값의 순서가 바뀌면 DB의 값과 맞지 않게 된다.
+     * value = EnumType.STRING로 변경해서 사용하자.
+     */
+    @Enumerated(value = EnumType.STRING)
+    private CommentStatus status;
+
+    /**
      * Auditing 기능을 위한 프로퍼티들.
      * @CreatedDate, @CreatedBy, @LastModifiedDate, @LastModifiedBy을
      * 설정한다.
