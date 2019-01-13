@@ -19,8 +19,11 @@ public class Comment {
     private String comment;
 
     /**
-     * 기본적으로 @ManyToOne이 붙은 프로퍼티들은 fetch = FetchType.EAGER가
+     * 기본적으로 @ManyToOne 같이 @~One이 붙은 프로퍼티들은 fetch = FetchType.EAGER가
      * default이다. 이 뜻은 Select 쿼리시 연관된 post도 같이 가져온다는 뜻이다.
+     *
+     * 반대로, @OneToMany 같이 @~Many가 붙은 프로퍼티들은 fetch = FetchType.LAZY가
+     * default이다.
      */
 //    @ManyToOne
     @ManyToOne(fetch = FetchType.LAZY)
